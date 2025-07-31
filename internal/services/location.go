@@ -3,12 +3,12 @@ package services
 import (
 	"context"
 	"reactive-framework/internal/entities"
-	"reactive-framework/internal/observer"
+	"reactive-framework/internal/promise"
 	"time"
 )
 
 func getLocation() (entities.Location, error) {
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 
 	return entities.Location{
 		Lat: 42.1,
@@ -16,6 +16,6 @@ func getLocation() (entities.Location, error) {
 	}, nil
 }
 
-func AsyncGetLocation(ctx context.Context) *observer.Promise[entities.Location] {
-	return observer.Async(ctx, getLocation)
+func AsyncGetLocation(ctx context.Context) *promise.Promise[entities.Location] {
+	return promise.Async(ctx, getLocation)
 }

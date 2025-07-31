@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"reactive-framework/internal/entities"
-	"reactive-framework/internal/observer"
+	"reactive-framework/internal/promise"
 	"time"
 )
 
@@ -19,21 +19,21 @@ func getProducts(user entities.User, location entities.Location) (entities.Produ
 
 func AsyncGetProducts(
 	ctx context.Context,
-	userPromise *observer.Promise[entities.User],
-	locationPromise *observer.Promise[entities.Location],
-) *observer.Promise[entities.Products] {
-	user, err := observer.Await(userPromise)
-	if err != nil && !userPromise.IsDegradable() {
-		panic(err)
-	}
-
-	location, err := observer.Await(locationPromise)
-	if err != nil && !locationPromise.IsDegradable() {
-		panic(err)
-	}
-
-	return observer.Async(ctx,
+	userPromise *promise.Promise[entities.User],
+	locationPromise *promise.Promise[entities.Location],
+) *promise.Promise[entities.Products] {
+	return promise.Async(ctx,
 		func() (entities.Products, error) {
+			user, err := promise.Await(userPromise)
+			if err != nil && !userPromise.IsDegradable() {
+				panic(err)
+			}
+
+			location, err := promise.Await(locationPromise)
+			if err != nil && !locationPromise.IsDegradable() {
+				panic(err)
+			}
+
 			return getProducts(user, location)
 		},
 	)

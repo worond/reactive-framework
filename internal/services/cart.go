@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"reactive-framework/internal/entities"
-	"reactive-framework/internal/observer"
+	"reactive-framework/internal/promise"
 )
 
 func getCart(
@@ -38,32 +38,36 @@ func getCart(
 	}, nil
 }
 
-func AwaitGetCart(
+func AsyncGetCart(
 	ctx context.Context,
-	userPromise *observer.Promise[entities.User],
-	productsPromise *observer.Promise[entities.Products],
-	pricesPromise *observer.Promise[entities.Prices],
-	labelsPromise *observer.Promise[entities.Labels],
-) (entities.Cart, error) {
-	user, err := observer.Await(userPromise)
-	if err != nil && !userPromise.IsDegradable() {
-		panic(err)
-	}
+	userPromise *promise.Promise[entities.User],
+	productsPromise *promise.Promise[entities.Products],
+	pricesPromise *promise.Promise[entities.Prices],
+	labelsPromise *promise.Promise[entities.Labels],
+) *promise.Promise[entities.Cart] {
+	return promise.Async(ctx,
+		func() (entities.Cart, error) {
+			user, err := promise.Await(userPromise)
+			if err != nil && !userPromise.IsDegradable() {
+				panic(err)
+			}
 
-	products, err := observer.Await(productsPromise)
-	if err != nil && !productsPromise.IsDegradable() {
-		panic(err)
-	}
+			products, err := promise.Await(productsPromise)
+			if err != nil && !productsPromise.IsDegradable() {
+				panic(err)
+			}
 
-	prices, err := observer.Await(pricesPromise)
-	if err != nil && !pricesPromise.IsDegradable() {
-		panic(err)
-	}
+			prices, err := promise.Await(pricesPromise)
+			if err != nil && !pricesPromise.IsDegradable() {
+				panic(err)
+			}
 
-	labels, err := observer.Await(labelsPromise)
-	if err != nil && !labelsPromise.IsDegradable() {
-		panic(err)
-	}
+			labels, err := promise.Await(labelsPromise)
+			if err != nil && !labelsPromise.IsDegradable() {
+				panic(err)
+			}
 
-	return getCart(user, products, prices, labels)
+			return getCart(user, products, prices, labels)
+		},
+	)
 }

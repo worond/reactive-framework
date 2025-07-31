@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"reactive-framework/internal/entities"
-	"reactive-framework/internal/observer"
+	"reactive-framework/internal/promise"
 	"time"
 )
 
@@ -27,15 +27,15 @@ func getLabelsWithError(products entities.Products) (entities.Labels, error) {
 
 func AsyncGetLabels(
 	ctx context.Context,
-	productsPromise *observer.Promise[entities.Products],
-) *observer.Promise[entities.Labels] {
-	products, err := observer.Await(productsPromise)
-	if err != nil && !productsPromise.IsDegradable() {
-		panic(err)
-	}
-
-	return observer.Async(ctx,
+	productsPromise *promise.Promise[entities.Products],
+) *promise.Promise[entities.Labels] {
+	return promise.Async(ctx,
 		func() (entities.Labels, error) {
+			products, err := promise.Await(productsPromise)
+			if err != nil && !productsPromise.IsDegradable() {
+				panic(err)
+			}
+
 			return getLabels(products)
 		},
 	)
@@ -43,15 +43,15 @@ func AsyncGetLabels(
 
 func AsyncGetLabelsWithError(
 	ctx context.Context,
-	productsPromise *observer.Promise[entities.Products],
-) *observer.Promise[entities.Labels] {
-	products, err := observer.Await(productsPromise)
-	if err != nil && !productsPromise.IsDegradable() {
-		panic(err)
-	}
-
-	return observer.Async(ctx,
+	productsPromise *promise.Promise[entities.Products],
+) *promise.Promise[entities.Labels] {
+	return promise.Async(ctx,
 		func() (entities.Labels, error) {
+			products, err := promise.Await(productsPromise)
+			if err != nil && !productsPromise.IsDegradable() {
+				panic(err)
+			}
+
 			return getLabelsWithError(products)
 		},
 	)

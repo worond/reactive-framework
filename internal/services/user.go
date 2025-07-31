@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"reactive-framework/internal/entities"
-	"reactive-framework/internal/observer"
+	"reactive-framework/internal/promise"
 	"time"
 )
 
@@ -16,6 +16,6 @@ func getUser() (entities.User, error) {
 	}, nil
 }
 
-func AsyncGetUser(ctx context.Context) *observer.Promise[entities.User] {
-	return observer.Async(ctx, getUser)
+func AsyncGetUser(ctx context.Context) *promise.Promise[entities.User] {
+	return promise.Async(ctx, getUser)
 }
